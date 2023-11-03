@@ -19,11 +19,8 @@ public:
 public slots:
     void on_pb_clear_clicked();
     void on_pb_timer_clicked();
-    void RcvStartSignal();
+    void RcvTimerSignal(uint milli);
     void RcvClear();
-    void RcvStartLap();
-
-
 
 private slots:
     void on_pb_lap_clicked();

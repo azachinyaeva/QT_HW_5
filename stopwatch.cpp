@@ -3,12 +3,12 @@
 Stopwatch::Stopwatch(QObject* parent) : QObject (parent)
 {
     milli = 0;
-    sec = 0;
-    min = 0;
     lap = 1;
     lap_time = 0;
     prev_sec = 0;
     timer = new QTimer(this);
+
+    QObject::connect(timer, &QTimer::timeout, this, &Stopwatch::RcvTimer);
 
 }
 
@@ -21,21 +21,6 @@ void Stopwatch::startTimer()
 {
     start = true;
     timer->start(1);
-    clock();
-}
-
-void Stopwatch::clock()
-{
-
-    milli++;
-    if (milli >= 1000) {
-        milli = 0;
-        sec++;
-    }
-    if (sec >= 60) {
-        sec = 0;
-        min++;
-    }
 }
 
 void Stopwatch::stopTimer()
@@ -54,30 +39,21 @@ void Stopwatch::setLap(int num)
     lap = num;
 }
 
-void Stopwatch::startLap()
-{
-    emit sig_Lap();
-}
-
 int Stopwatch::count_lap_time()
 {
-    lap_time = sec - prev_sec;
+    lap_time = (milli/1000) - prev_sec;
     return lap_time;
 }
 
-int Stopwatch::getMilli()
+uint Stopwatch::getMilli()
 {
     return milli;
 }
 
-int Stopwatch::getSec()
-{
-    return sec;
-}
 
-int Stopwatch::getMin()
+void Stopwatch::setPrevSec(uint seconds)
 {
-    return min;
+    prev_sec = seconds;
 }
 
 QTimer* Stopwatch::getTimer()
@@ -94,12 +70,19 @@ void Stopwatch::clear()
 {
 
     milli = 0;
-    sec = 0;
-    min = 0;
     lap = 1;
     lap_time = 0;
     prev_sec = 0;
     emit sig_Clear();
+}
+
+void Stopwatch::RcvTimer()
+{
+    if (start)
+    {
+        milli++;
+        emit sig_Timer(milli);
+    }
 }
 
 

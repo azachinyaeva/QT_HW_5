@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -12,9 +13,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->l_time->setText("0:0:00");
     ui->pb_lap->setEnabled(true);
 
-    QObject::connect(watch->getTimer(), &QTimer::timeout, this, &MainWindow::RcvStartSignal);
+    QObject::connect(watch, &Stopwatch::sig_Timer, this, &MainWindow::RcvTimerSignal);
     QObject::connect(watch, &Stopwatch::sig_Clear, this, &MainWindow::RcvClear);
-    QObject::connect(watch, &Stopwatch::sig_Lap, this, &MainWindow::RcvStartLap);
 
 }
 
@@ -44,12 +44,12 @@ void MainWindow::on_pb_timer_clicked()
     }
 }
 
-void MainWindow::RcvStartSignal()
+void MainWindow::RcvTimerSignal(uint milli)
 {
     watch->startTimer();
-    ui->l_time->setText(QString::number(watch->getMin()) + " : "
-                        + QString::number(watch->getSec()) + " : "
-                        + QString::number(watch->getMilli()));
+    ui->l_time->setText(QString::number(milli/60000) + " : "
+                        + QString::number(milli/1000) + " : "
+                        + QString::number(watch->getMilli()).remove(0, 1));
 }
 
 
@@ -58,16 +58,11 @@ void MainWindow::RcvClear()
     ui->l_time->setText("0:0:00");
 }
 
-void MainWindow::RcvStartLap()
-{
-    ui->tb_show->append("Круг: " + QString::number(watch->lap) + " Время: " + QString::number(watch->count_lap_time()) + "сек. ");
-    watch->prev_sec = watch->getSec();
-    watch->setLap(watch->lap + 1);
-
-}
 
 void MainWindow::on_pb_lap_clicked()
 {
-    watch->startLap();
+    ui->tb_show->append("Круг: " + QString::number(watch->getLap()) + " Время: " + QString::number(watch->count_lap_time()) + "сек. ");
+    watch->setPrevSec(watch->getMilli()/1000);
+    watch->setLap(watch->getLap() + 1);
 }
 

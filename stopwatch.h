@@ -13,33 +13,31 @@ public:
     ~Stopwatch();
 
     void startTimer();
-    void clock();
     void stopTimer();
     int getLap();
     void setLap(int num);
-    void startLap();
     int count_lap_time();
-    int getMilli();
-    int getSec();
-    int getMin();
+    uint getMilli();
+    void setPrevSec(uint seconds);
     QTimer* getTimer();
     bool isStart();
     void clear();
 
 
-public:
-    int milli;
-    int sec;
-    int min;
+private:
+    uint milli;
     int lap;
-    int lap_time;
+    uint lap_time;
     int prev_sec;
     bool start = false;
     QTimer* timer;
 
+private slots:
+    void RcvTimer();
+
 signals:
     void sig_Clear();
-    void sig_Lap();
+    void sig_Timer(uint);
 };
 
 #endif // STOPWATCH_H
